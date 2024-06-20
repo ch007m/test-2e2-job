@@ -168,8 +168,11 @@ jobs:
           CLUSTER_PORT=$(docker inspect localdev-control-plane | jq -r '.[].NetworkSettings.Ports."6443/tcp"[0].HostPort')
           API_URL="https://$CLUSTER_IP:$CLUSTER_PORT"
           echo "API_URL=$API_URL" >> "$GITHUB_ENV"
+          
+          echo "Log the Kubernetes API URL"
+          echo "API_URL=$API_URL"
 
-      - name: Logon anc configure ArgoCD server
+      - name: Logon and configure ArgoCD server
         run: |
           argocd --insecure login $ARGOCD_SERVER_HOST:$ARGOCD_SERVER_PORT --username $ARGOCD_USERNAME --password $ARGOCD_PASSWORD
           
