@@ -5,13 +5,13 @@
 
 RESOURCE="${1}"
 NAME="${2}"
-NAMESPACE="${3}"
+KUBE_NAMESPACE="${3}"
 EXPECTED="${4}"
 EXTRA="${5-}"
 
 retries=30
 until [[ $retries == 0 ]]; do
-  actual=$(kubectl get $RESOURCE $NAME -n $NAMESPACE $EXTRA 2>/dev/null || echo "Waiting for $RESOURCE/$NAME -> $EXPECTED to appear")
+  actual=$(kubectl get $RESOURCE $NAME -n $KUBE_NAMESPACE $EXTRA 2>/dev/null || echo "Waiting for $RESOURCE/$NAME -> $EXPECTED to appear")
   if [[ "$actual" =~ .*"$EXPECTED".* ]]; then
     echo "Resource \"$RESOURCE/$NAME\" found" 2>&1
     echo "$actual" 2>&1
@@ -25,5 +25,5 @@ until [[ $retries == 0 ]]; do
 done
 
 echo "Describe the resource ..."
-echo "kubectl describe $RESOURCE $NAME -n $NAMESPACE" 2>&1
-kubectl describe $RESOURCE $NAME -n $NAMESPACE 2>&1
+echo "kubectl describe $RESOURCE $NAME -n $KUBE_NAMESPACE" 2>&1
+kubectl describe $RESOURCE $NAME -n $KUBE_NAMESPACE 2>&1
