@@ -1,0 +1,430 @@
+# Backstage doc: https://backstage.io/docs/features/software-templates/writing-templates#the-templating-syntax
+# builtin filters: https://mozilla.github.io/nunjucks/templating.html#builtin-filters
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: quarkus-application
+  title: Create a Quarkus Application
+  description: Create a Quarkus application using https://code.quarkus.io
+  tags:
+    - quarkus
+    - java
+    - maven
+spec:
+  owner: guests
+  type: service
+
+  parameters:
+    - title: Provide information for the Quarkus Application
+      required:
+        - component_id
+        - owner
+      properties:
+        component_id:
+          title: Name
+          type: string
+          description: Unique name of the application
+          default: my-quarkus-app
+          ui:field: EntityNamePicker
+        quarkusVersion:
+          title: Quarkus version
+          type: string
+          description: The list of the quarkus supported/recommended
+          ui:field: QuarkusVersionList
+        owner:
+          title: Owner
+          type: string
+          default: user:guest
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind:
+                - Group
+                - User
+        native:
+          title: Quarkus native build
+          type: boolean
+          default: false
+          ui:widget: radio
+
+    - title: Provide information about the Java metadata
+      required:
+        - java_package_name
+      properties:
+        groupId:
+          title: Group ID
+          type: string
+          default: io.quarkus
+          description: Maven Group ID eg (io.janus)
+        artifactId:
+          title: Artifact ID
+          type: string
+          default: my-quarkus-app
+          description: Maven Artifact ID
+        version:
+          title: Version
+          type: string
+          default: 1.0.0-SNAPSHOT
+          description: Maven Artifact Version
+        java_package_name:
+          title: Java Package Namespace
+          type: string
+          default: io.quarkus.demo
+          description: Name for the Java Package (e.g. io.quarkus.demo)
+        description:
+          title: Description
+          type: string
+          description: Help others understand what this website is for.
+          default: A cool quarkus app
+        javaVersion:
+          title: Java Version
+          type: string
+          description: Java version
+          default: '17'
+          enum:
+            - '17'
+            - '21'
+          enumNames:
+            - Java 17
+            - Java 21
+        buildTool:
+          title: Build Tool
+          type: string
+          description: The Build tool to use
+          default: MAVEN
+          enum:
+            - MAVEN
+            - GRADLE
+            - GRADLE_KOTLIN_DSL
+          enumNames:
+            - Maven
+            - Gradle
+            - Gradle Kotlin DSL
+
+    - title: Select additional features such database, endpoints, etc
+      required:
+        - healthEndpoint
+        - metricsEndpoint
+        - infoEndpoint
+      properties:
+        database:
+          title: Select a database (optional)
+          type: string
+          default: quarkus-jdbc-postgresql
+          enum:
+            - quarkus-jdbc-postgresql
+            - quarkus-jdbc-mysql
+            - quarkus-jdbc-h2
+          enumNames:
+            - 'PostgreSQL'
+            - 'MySQL'
+            - 'H2'
+        healthEndpoint:
+          title: Enable health endpoint
+          type: boolean
+          default: true
+          ui:widget: radio
+
+        metricsEndpoint:
+          title: Enable metrics endpoint
+          type: boolean
+          default: true
+          ui:widget: radio
+
+        infoEndpoint:
+          title: Enable info endpoint
+          type: boolean
+          default: true
+          ui:widget: radio
+
+        extensions:
+          title: Alternative Extensions
+          type: array
+          description: The list of alternative extensions
+          ui:field: QuarkusExtensionList
+          default:
+            - quarkus-rest-jackson
+            - quarkus-smallrye-openapi
+            - quarkus-hibernate-orm-rest-data-panache
+            - quarkus-hibernate-validator
+          ui:options:
+            # codeQuarkusUrl: https://code.quarkus.io
+            filter:
+              extensions:
+                - quarkus-rest-jackson
+                - quarkus-smallrye-openapi
+                - quarkus-smallrye-graphql
+                - quarkus-hibernate-orm-rest-data-panache
+
+        additionalProperties:
+          title: Additional Properties
+          type: string
+          description: Additional Properties (to be appended to src/main/application.properties)
+          ui:widget: textarea
+          ui:options:
+            rows: 5
+
+    - title: Configure the Git repository
+      required:
+        - repo
+      properties:
+        repo:
+          title: Repository Location
+          type: object
+          properties:
+            host:
+              title: Repo Host
+              type: string
+              default: github.com
+              enum:
+                - github.com
+                - gitea.cnoe.localtest.me:8443
+
+            org:
+              title: Repo Org Owner
+              type: string
+              description: Your SCM organization/group
+              default: q-shift
+              enum:
+                - q-shift
+                - aureamunoz
+                - ch007m
+                - iocanel
+
+            visibility:
+              title: Visibility of the repository
+              type: string
+              default: 'public'
+              enum:
+                - 'public'
+                - 'private'
+              enumNames:
+                - 'public'
+                - 'private'
+
+    - title: Provide Cloud information
+      required:
+        - imageUrl
+        - namespace
+      properties:
+        namespace:
+          title: Namespace
+          type: string
+          description: The openshift/kubernetes namespace for deploying resources
+          default: demo
+          enum:
+            - cmoullia
+            - demo
+            - dummy
+            - iocanel
+
+        imageRepository:
+           title: Select a registry
+           type: string
+           default: quay.io
+           enum:
+             - quay.io
+             - gitea.cnoe.localtest.me:8443/giteadmin
+             - image-registry.openshift-image-registry.svc:5000
+           enumNames:
+             - Quay
+             - Gitea
+             - Internal OpenShift Registry
+
+        imageUrl:
+          title: Image URL
+          type: string
+          description: The Quay.io or OpenShift Image URL <REGISTRY>/<IMAGE_URL>/<REPO_NAME>
+          default: quay.io/snowdrop/my-quarkus-app
+          enumNames:
+            - quay.io/snowdrop/my-quarkus-app
+            - quay.io/ch007m/my-quarkus-app
+            - quay.io/iocanel/my-quarkus-app
+            - gitea.cnoe.localtest.me:8443/giteadmin/my-quarkus-app
+
+        virtualMachineName:
+          title: Virtual Machine Name
+          description: Name of the virtual machine running podman to use
+          type: string
+          default: quarkus-dev
+
+        virtualMachineNamespace:
+          title: VMI Namespace
+          description: Namespace where the virtual machine runs
+          type: string
+          default: demo
+          enum:
+            - cmoullia
+            - demo
+            - dummy
+            - iocanel
+
+  steps:
+    - id: template
+      name: Generating the Source Code Component
+      action: quarkus:app:create
+      input:
+        values:
+          quarkusVersion: ${{ parameters.quarkusVersion }}
+          groupId: ${{ parameters.groupId }}
+          artifactId: ${{ parameters.artifactId }}
+          version: ${{ parameters.version }}
+          buildTool: ${{ parameters.buildTool }}
+          javaVersion: ${{ parameters.javaVersion }}
+          extensions: ${{ parameters.extensions }}
+          database: ${{ parameters.database }}
+          infoEndpoint: ${{ parameters.infoEndpoint }}
+          healthEndpoint: ${{ parameters.healthEndpoint }}
+          metricsEndpoint: ${{ parameters.metricsEndpoint }}
+          additionalProperties: ${{ parameters.additionalProperties }}
+          starterCode: true
+
+    - id: mavenDependenciesAdd
+      name: Adding required maven dependencies
+      action: maven:dependencies:add
+      input:
+        values:
+          dependencies:
+            - groupId: io.quarkus
+              artifactId: quarkus-rest-jackson
+            - groupId: io.quarkus
+              artifactId: quarkus-smallrye-openapi
+            - groupId: io.quarkus
+              artifactId: quarkus-hibernate-orm-rest-data-panache
+            - groupId: io.quarkus
+              artifactId: quarkus-hibernate-validator
+            - groupId: io.quarkiverse.web-bundler
+              artifactId: quarkus-web-bundler
+              version: 1.4.0
+            - groupId: 'org.mvnpm.at.mvnpm'
+              artifactId: 'vaadin-webcomponents'
+              version: '24.3.10'
+              scope: 'provided'
+
+    - id: appFiles
+      name: Fetching app files ...
+      action: fetch:template
+      input:
+        url: skeletons/app/
+        replace: true
+        copyWithoutTemplating: [
+          src/main/resources/web/index.html
+        ]
+        values:
+          java_package_name: ${{ parameters.java_package_name }}
+          java_package_path: ${{ parameters.java_package_name | replace(".", "/") }}
+          extensions: ${{ parameters.extensions }}
+          database: ${{ parameters.database }}
+          database_username: postgres
+          database_name: ${{ parameters.component_id}}-db
+
+    - id: catalogTemplate
+      name: Generating the Catalog Info Component
+      action: fetch:template
+      input:
+        url: skeletons/catalog-info/
+        values:
+          component_id: ${{ parameters.component_id }}
+          clusterDomainName: apps.qshift.snowdrop.dev #TODO: Find a way to configure it
+          orgName: ${{ parameters.repo.org }}
+          repoName: ${{ parameters.repo.name }}
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          applicationType: service
+          description: ${{ parameters.description }}
+          # TODO: To be reviewed and tested with different git providers
+          destination: ${{ parameters.repo.org }}/${{ parameters.component_id }}
+          host: ${{ parameters.repo.host }}
+          namespace: ${{ parameters.namespace }}
+          imageUrl: ${{ parameters.imageUrl }}
+          imageBuilder: s2i-java
+          imageRepository: ${{ parameters.imageRepository }}
+          port: 8080
+          ci: ${{ parameters.ci }}
+          quarkusVersion: ${{ parameters.quarkusVersion }}
+          groupId: ${{ parameters.groupId }}
+          artifactId: ${{ parameters.artifactId }}
+          javaPackageName: ${{ parameters.javaPackageName}}
+          sourceControl: github.com
+
+    - id: gitopsTemplate
+      name: Generating GitOps Resources
+      action: fetch:template
+      input:
+        url: manifests/
+        copyWithoutTemplating: []
+        values:
+          component_id: ${{ parameters.component_id }}
+          description: ${{ parameters.description }}
+          # TODO: To be reviewed and tested with different git providers
+          destination: https://${{ parameters.repo.host }}/${{ parameters.repo.org }}/${{ parameters.component_id }}.git
+          git_repo: ${{ parameters.repo.host }} # quay.io, ghcr.io, docker.io, etc
+          git_org: ${{ parameters.repo.org }}
+          git_repo_name: ${{ parameters.component_id }}
+          git_branch: main
+          image_url: ${{ parameters.imageUrl }}
+          appNamespace: ${{ parameters.namespace }}
+          virtualMachineName: ${{ parameters.virtualMachineName }}
+          virtualMachineNamespace: ${{ parameters.virtualMachineNamespace }}
+          native: ${{ parameters.native }}
+          database: ${{ parameters.database }}
+          database_username: postgres
+          database_name: ${{ parameters.component_id}}-db
+          
+    - id: publish-github
+      name: Publishing to Github
+      action: publish:github
+      if: ${{ parameters.repo.host === "github.com" }}
+      input:
+        allowedHosts: ['github.com']
+        description: This is ${{ parameters.component_id }}
+        repoUrl: ${{ parameters.repo.host }}?owner=${{ parameters.repo.org }}&repo=${{parameters.component_id}}
+        defaultBranch: main
+        protectDefaultBranch: false
+        repoVisibility: ${{ parameters.repo.visibility }}
+
+    - id: publish-gitea
+      name: Publishing to a gitea git repository
+      action: publish:gitea
+      if: ${{ parameters.repo.host !== "github.com" }}
+      input:
+        name: This is a dummy project
+        description: This is ${{ parameters.component_id }}
+        repoUrl: ${{ parameters.repo.host }}?owner=${{ parameters.repo.org }}&repo=${{ parameters.component_id }}
+        repoVisibility: ${{ parameters.repo.visibility }}
+        defaultBranch: main
+
+    - id: register
+      name: Registering the Catalog Info Component
+      action: catalog:register
+      input:
+        # TODO:
+        # - To be reviewed and tested with different git providers
+        # - This syntax fails: repoContentsUrl: ${{ steps.publish-${{ 'github' if parameters.repo.host == 'github.com' else 'gitea' }}.output.repoContentsUrl }}
+
+        # Github
+        # repoContentsUrl: ${{ steps['publish-gitea'].output.repoContentsUrl }}
+        # catalogInfoPath: /catalog-info.yaml
+
+        # Gitea
+        catalogInfoUrl: https://${{ parameters.repo.host }}/${{ parameters.repo.org }}/${{ parameters.component_id }}/src/branch/main/catalog-info.yaml
+
+    - id: create-argocd-resources
+      name: Create ArgoCD Resources
+      action: argocd:create-resources
+      input:
+        appName: ${{ parameters.component_id }}-bootstrap
+        argoInstance: argocdQShift # Match appconfig => argocd/appLocatorMethods/instances/name
+        projectName: ${{ parameters.component_id }}
+        namespace: ${{ parameters.namespace }}
+        # TODO: To be reviewed and tested with different git providers
+        repoUrl: https://${{ parameters.repo.host }}/${{ parameters.repo.org }}/${{ parameters.component_id }}.git
+        path: 'argocd/'
+
+  output:
+    links:
+      - title: Open the Source Code Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open the Catalog Info Component
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}

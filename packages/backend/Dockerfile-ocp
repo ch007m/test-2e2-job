@@ -1,0 +1,60 @@
+# This dockerfile builds an image including the packages/app & backend for OpenShift.
+# The files created and pushed within the image are owned by the user: 1001
+# Before building this image, be sure to have run the following commands in the repo root:
+#
+# yarn install
+# yarn tsc
+# yarn build:backend
+#
+# Once the commands have been run, you can build the image using `yarn build-ocp-image -t quay.io/<ORG>/backstage:latest`
+
+FROM registry.access.redhat.com/ubi9/nodejs-18
+USER 0
+RUN dnf install -y python3 zlib zlib-devel brotli brotli-devel make gcc-c++ gzip git sqlite-devel && dnf clean all
+
+# Not needed as we use corepack to install it => RUN npm i -g yarn
+# Not needed as backstage installs it => RUN npm i -g node-gyp
+
+# install and use yarn 4.x
+ENV YARN_VERSION=4.2.2
+RUN npm i -g corepack
+RUN corepack enable && corepack prepare yarn@${YARN_VERSION}
+
+# Set up a virtual environment for mkdocs-techdocs-core.
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+RUN pip3 install mkdocs-techdocs-core==1.1.7
+
+WORKDIR /app
+RUN chown 1001:0 /app
+USER 1001
+
+# This switches many Node.js dependencies to production mode.
+ENV NODE_ENV production
+
+# Copy over Yarn configuration, release, and plugins
+COPY --chown=1001:0 .yarn ./.yarn
+COPY --chown=1001:0 .yarnrc.yml ./
+
+# Copy repo skeleton first, to avoid unnecessary docker cache invalidation.
+# The skeleton contains the package.json of each package in the monorepo,
+# and along with yarn.lock and the root package.json, that's enough to run yarn install.
+COPY --chown=1001:0 yarn.lock package.json packages/backend/dist/skeleton.tar.gz ./
+RUN tar xzf skeleton.tar.gz && rm skeleton.tar.gz
+
+RUN --mount=type=cache,target=/home/node/.yarn/berry/cache,sharing=locked,uid=1001,gid=0 \
+    --mount=type=cache,target=/home/node/.yarn/berry/index,sharing=locked,uid=1001,gid=0 \
+    yarn workspaces focus -A --production
+
+COPY --chown=1001:0 packages/backend/dist/bundle.tar.gz app-config*.yaml ./
+RUN tar xzf bundle.tar.gz && rm bundle.tar.gz
+
+RUN chown -R 1001:0 ./
+RUN fix-permissions ./
+
+# From here on we use the user 1001 to run the backend.
+USER 1001
+
+CMD ["node", "packages/backend", "--config", "app-config.yaml"]

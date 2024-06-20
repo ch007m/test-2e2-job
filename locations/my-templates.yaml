@@ -1,0 +1,8 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: my-templates
+  description: My templates
+spec:
+  targets:
+    - ../temp/templates/gitea/template.yaml
