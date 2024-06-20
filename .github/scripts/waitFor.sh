@@ -23,3 +23,6 @@ until [[ $retries == 0 ]]; do
   sleep 10s
   retries=$((retries - 1))
 done
+
+echo "Describe the resource ..."
+kubectl describe $RESOURCE $NAME -n $NAMESPACE
