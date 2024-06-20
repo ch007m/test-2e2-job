@@ -31,7 +31,7 @@ env:
 
   # The git repo name is also the name of the project's parameter of the template
   REPO_NAME: my-quarkus-app-job
-  REPO_ORG: q-shift
+  REPO_ORG: ch007m
 
   QUAY_ORG: qshift
 
