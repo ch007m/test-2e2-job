@@ -6,3 +6,4 @@ metadata:
 spec:
   targets:
     - ../temp/templates/gitea/template.yaml
+    - ../temp/templates/dummy/template.yaml

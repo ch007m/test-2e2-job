@@ -398,16 +398,8 @@ spec:
       name: Registering the Catalog Info Component
       action: catalog:register
       input:
-        # TODO:
-        # - To be reviewed and tested with different git providers
-        # - This syntax fails: repoContentsUrl: ${{ steps.publish-${{ 'github' if parameters.repo.host == 'github.com' else 'gitea' }}.output.repoContentsUrl }}
-
-        # Github
-        # repoContentsUrl: ${{ steps['publish-gitea'].output.repoContentsUrl }}
-        # catalogInfoPath: /catalog-info.yaml
-
-        # Gitea
-        catalogInfoUrl: https://${{ parameters.repo.host }}/${{ parameters.repo.org }}/${{ parameters.component_id }}/src/branch/main/catalog-info.yaml
+        # Github and Gitea
+        catalogInfoUrl: https://${{ parameters.repo.host }}/${{ parameters.repo.org }}/${{ parameters.component_id }}/${{ 'blob' if parameters.repo.host == 'github.com' else 'src/branch' }}/main/catalog-info.yaml
 
     - id: create-argocd-resources
       name: Create ArgoCD Resources
