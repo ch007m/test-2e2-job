@@ -25,4 +25,5 @@ until [[ $retries == 0 ]]; do
 done
 
 echo "Describe the resource ..."
+echo "kubectl describe $RESOURCE $NAME -n $NAMESPACE"
 kubectl describe $RESOURCE $NAME -n $NAMESPACE
