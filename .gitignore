@@ -46,6 +46,7 @@ site
 
 # Local files
 *.local.yaml
+*.local.yaml.bk
 argocd.yaml
 app-config.qshift.yaml
 
