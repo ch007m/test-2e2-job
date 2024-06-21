@@ -96,15 +96,11 @@ jobs:
              sleep 10
           done
           
-          echo "#########################################"          
-          echo "Check if the ConfigMap has been patched and resources sync, otherwise exit"
-          echo "#########################################"
-          if kubectl get -n argocd cm/argocd-cmd-params-cm -o json | jq -e '.data | has("application.namespaces")'; then
-            echo "Key 'application.namespaces' exists in the ConfigMap."
-          else
-            echo "Key 'application.namespaces' does not exist in the ConfigMap."
-            exit 1;
-          fi
+          echo "Rollout Argocd as resources changed ..."
+          kubectl rollout restart -n argocd deployment argocd-server
+          kubectl rollout restart -n argocd statefulset argocd-application-controller
+
+          kubectl rollout status --watch statefulset/argocd-application-controller -n argocd --timeout=600s
 
 #      - name: Install Kubevirt
 #        run: |
