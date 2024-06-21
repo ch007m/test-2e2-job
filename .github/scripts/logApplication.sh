@@ -16,8 +16,3 @@ echo "#########################################"
 echo "Application YAML: $REPO_NAME-$SUFFIX in namespace: $NAMESPACE"
 echo "#########################################"
 kubectl get application $REPO_NAME-$SUFFIX -n $NAMESPACE -o yaml
-
-echo "#########################################"
-echo "Log ArgoCD server"
-echo "#########################################"
-kubectl logs -n argocd deployment/argocd-server

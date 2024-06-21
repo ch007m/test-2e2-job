@@ -79,6 +79,20 @@ jobs:
         run: |
           kubectl create ns ${KUBE_NAMESPACE}
 
+      - name: Wait till IDP ArgoCD applications is sync
+        run: |
+          SCRIPTS=$(pwd)/.github/scripts
+
+          if ! $SCRIPTS/waitFor.sh application argocd argocd Healthy; then
+            echo "Failed to watch application argocd in namespace argocd"
+            exit 1;
+          fi
+          
+          echo "#########################################"          
+          echo "Show ArgoCD CM to verify if it includes parameters needed to work cross namespaces ..."
+          echo "#########################################"
+          kubectl get -n argocd cm/argocd-cmd-params-cm -oyaml
+
 #      - name: Install Kubevirt
 #        run: |
 #          function is_nested_virt_enabled() {
@@ -230,14 +244,6 @@ jobs:
           kubectl rollout restart -n argocd statefulset argocd-application-controller
 
           kubectl rollout status --watch statefulset/argocd-application-controller -n argocd --timeout=600s
-          
-          echo "#########################################"          
-          echo "Show cm, statefulset ..."
-          echo "#########################################"
-          kubectl get -n argocd cm/argocd-cmd-params-cm -oyaml
-          kubectl get -n argocd statefulset/argocd-application-controller -oyaml
-          
-          
 
       - uses: actions/setup-node@v4
         with:
@@ -473,65 +479,28 @@ jobs:
       - name: Execute if the job fails
         if: ${{ failure() }}
         run: |
+          SCRIPTS=$(pwd)/.github/scripts
+          
           echo "#########################################"
           echo "Get pods ...."
           echo "#########################################"
           kubectl get pods -A
           
-          echo "#########################################"
-          echo "Get Tekton pipeline ..."
-          echo "#########################################"
-          kubectl get pipeline -A --ignore-not-found
-
-          echo "#########################################"  
-          echo "Get Tekton pipelineruns ..."
-          echo "#########################################"
-          kubectl get pipelineruns -A --ignore-not-found
-
           echo "#########################################"          
-          echo "Get Tekton taskruns ..."
+          echo "Show ArgoCD CM to verify if it includes parameters needed to work cross namespaces ..."
           echo "#########################################"
-          kubectl get taskruns -A --ignore-not-found
+          kubectl get -n argocd cm/argocd-cmd-params-cm -oyaml
           
-          echo "#########################################"
-          echo "List Argo Application ..."
-          echo "#########################################"
-          argocd app list
-
+          $SCRIPTS/listShowDescribeResource.sh AppProject argocd
+          
+          $SCRIPTS/listShowDescribeResource.sh Applications ${KUBE_NAMESPACE}
+          
           echo "#########################################"
           echo "Log ArgoCD application-controller ..."
           echo "#########################################"
           kubectl logs -n argocd -lapp.kubernetes.io/name=argocd-application-controller --tail=-1
           
-          echo "#########################################"
-          echo "List the Argocd projects ..."
-          echo "#########################################"
-          kubectl get appprojects -A
-          
-          echo "#########################################"
-          echo "Show ArgoCD projects YAML and events"
-          echo "#########################################"
-          kubectl get appprojects -A -oyaml
-          
-          echo "#########################################"
-          echo "Detail the ArgoCD projects ..."
-          echo "#########################################"
-          kubectl describe appprojects -A
-          
-          echo "#########################################"
-          echo "List the Applications" 
-          echo "#########################################"
-          kubectl get applications -A
-          
-          echo "#########################################"
-          echo "Show the applications YAML and events"
-          echo "#########################################"
-          kubectl get applications -A -oyaml
-          
-          echo "#########################################"
-          echo "Detail the applications ..."
-          echo "#########################################"
-          kubectl describe applications -A
+          # $SCRIPTS/logTektonResources.sh
           
 
           
