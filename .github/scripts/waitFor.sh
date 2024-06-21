@@ -24,12 +24,12 @@ until [[ $retries == 0 ]]; do
   retries=$((retries - 1))
 done
 
-echo "#########################################"
-echo "Describe resource: $RESOURCE $NAME in namespace $KUBE_NAMESPACE"
-echo "#########################################"
-kubectl describe $RESOURCE $NAME -n $KUBE_NAMESPACE 2>&1
+# echo "#########################################"
+# echo "Describe resource: $RESOURCE $NAME in namespace $KUBE_NAMESPACE"
+# echo "#########################################"
+# kubectl describe $RESOURCE $NAME -n $KUBE_NAMESPACE 2>&1
 
-echo "#########################################"
-echo "Resource YAML: $NAME in namespace $KUBE_NAMESPACE"
-echo "#########################################"
-kubectl get $RESOURCE $NAME -n $KUBE_NAMESPACE -o yaml
+# echo "#########################################"
+# echo "Resource YAML: $NAME in namespace $KUBE_NAMESPACE"
+# echo "#########################################"
+# kubectl get $RESOURCE $NAME -n $KUBE_NAMESPACE -o yaml

@@ -379,10 +379,10 @@ jobs:
         run: |
           SCRIPTS=$(pwd)/.github/scripts
           
-          echo "#########################################"          
-          echo "Create manually the ArgoCD resources: project and application bootstrap ..."
-          echo "#########################################"          
-          kubectl apply -f $(pwd)/.github/resources/argocd.yaml
+          # echo "#########################################"          
+          # echo "Create manually the ArgoCD resources: project and application bootstrap ..."
+          # echo "#########################################"          
+          # kubectl apply -f $(pwd)/.github/resources/argocd.yaml
 
           if ! $SCRIPTS/waitFor.sh application $REPO_NAME-bootstrap argocd Healthy; then
             echo "Failed to watch: application $REPO_NAME-bootstrap"
