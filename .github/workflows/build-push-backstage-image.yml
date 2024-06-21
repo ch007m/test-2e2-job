@@ -3,7 +3,7 @@ name: Build backstage app, image and push it
 on:
   push:
     branches:
-      - main
+      - test
     tags-ignore:
       - v*
   pull_request_target:
