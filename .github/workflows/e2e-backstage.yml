@@ -498,21 +498,29 @@ jobs:
           kubectl get appprojects -A
           
           echo "#########################################"
-          echo "Log ArgoCD projects YAML and events"
+          echo "Show ArgoCD projects YAML and events"
           echo "#########################################"
           kubectl get appprojects -A -oyaml
           
           echo "#########################################"
-          echo "List the Argocd applications: parent and children ..."
+          echo "Detail the ArgoCD projects ..."
           echo "#########################################"
-          argocd app list -p ${REPO_NAME} -N argocd
-          argocd app list -p default -N ${KUBE_NAMESPACE}
+          kubectl describe appprojects -A
           
           echo "#########################################"
-          echo "Detail the applications and projects ..."
+          echo "List the Applications" 
           echo "#########################################"
-          kubectl get appprojects -A -oyaml
-          kubectl describe applications -n ${KUBE_NAMESPACE}
+          kubectl get applications -A
+          
+          echo "#########################################"
+          echo "Show the applications YAML and events""
+          echo "#########################################"
+          kubectl get applications -A -oyaml
+          
+          echo "#########################################"
+          echo "Detail the applications ..."
+          echo "#########################################"
+          kubectl describe applications -A
           
 
           
