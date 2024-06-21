@@ -1,0 +1,44 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: my-quarkus-app-job
+  namespace: argocd
+spec:
+  destinations:
+    - name: local
+      namespace: dummy
+      server: https://kubernetes.default.svc
+  sourceRepos:
+    - https://github.com/ch007m/my-quarkus-app-job.git
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  labels:
+    backstage-name: my-quarkus-app-job-bootstrap
+  name: my-quarkus-app-job-bootstrap
+  namespace: argocd
+spec:
+  destination:
+    namespace: dummy
+    server: https://kubernetes.default.svc
+  project: my-quarkus-app-job
+  revisionHistoryLimit: 10
+  source:
+    path: argocd/
+    repoURL: https://github.com/ch007m/my-quarkus-app-job.git
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    retry:
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 5m
+      limit: 10
+    syncOptions:
+      - CreateNamespace=false
+      - FailOnSharedResource=true
