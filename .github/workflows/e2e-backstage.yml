@@ -371,43 +371,61 @@ jobs:
           echo "Detail Application(s) information"
           echo "#########################################"
           kubectl get application -A
+
+      - name: Wait till the children applications are synced too
+        run: |          
+            function log_application {
+              local REPO_NAME=$1
+              local SUFFIX=$2
+              local NAMESPACE=$3
+          
+              echo "#########################################"
+              echo "Failed to get application $REPO_NAME-$SUFFIX Synced in namespace: $NAMESPACE"
+          
+              echo "#########################################"
+              echo "Describe Application: $REPO_NAME-$SUFFIX in namespace: $NAMESPACE
+              echo "#########################################"  
+              kubectl describe application $REPO_NAME-$SUFFIX -n $NAMESPACE
+          
+            echo "#########################################"
+            echo "Application YAML: $REPO_NAME-$SUFFIX in namespace: $NAMESPACE
+            echo "#########################################"  
+            kubectl get application $REPO_NAME-$SUFFIX -n $NAMESPACE -o yaml         
+             
+              echo "#########################################"
+              echo "Log ArgoCD server
+              echo "#########################################"
+              kubectl logs -n argocd deployment/argocd-server
+            }
+          
           
           if ! $SCRIPTS/waitFor.sh application $REPO_NAME-build-test-push ${KUBE_NAMESPACE} Synced ; then
-            echo "Failed to get: application $REPO_NAME-build-test-push Synced"
-            echo "#########################################"
-            kubectl describe application $REPO_NAME-build-test-push -n ${KUBE_NAMESPACE}
-          
-            echo "#########################################"
-            kubectl logs -n argocd deployment/argocd-server
+            log_application $REPO_NAME build-test-push $KUBE_NAMESPACE
             exit 1;
+          else
+            echo "#########################################"
+            echo "Show Application ${REPO_NAME}-build-test-push in namespace ${KUBE_NAMESPACE}
+            echo "#########################################"
+            argocd app get ${KUBE_NAMESPACE}/${REPO_NAME}-build-test-push
           fi
           
           if ! $SCRIPTS/waitFor.sh application $REPO_NAME-db ${KUBE_NAMESPACE} Synced ; then
-            echo "Failed to get: application $REPO_NAME-db Synced"
-            echo "#########################################"
-            kubectl describe application $REPO_NAME-db -n ${KUBE_NAMESPACE}
-          
-            echo "#########################################"
-            kubectl logs -n argocd deployment/argocd-server
+            log_application $REPO_NAME db $KUBE_NAMESPACE
             exit 1;
+          else
+            echo "#########################################"
+            echo "Show Application ${REPO_NAME}-db in namespace ${KUBE_NAMESPACE}
+            echo "#########################################"
           fi
           
-          if ! $SCRIPTS/waitFor.sh application $REPO_NAME-deploy ${KUBE_NAMESPACE} Synced ; then
-            echo "Failed to get: application $REPO_NAME-deploy Synced"
-            echo "#########################################"
-            kubectl describe application $REPO_NAME-deploy -n ${KUBE_NAMESPACE}
-            
-            echo "#########################################"
-            kubectl logs -n argocd deployment/argocd-server
+          if ! $SCRIPTS/waitFor.sh application $REPO_NAME-deploy $KUBE_NAMESPACE Synced ; then
+            log_application $REPO_NAME deploy $KUBE_NAMESPACE
             exit 1;
+          else
+          echo "#########################################"
+          echo "Show Application ${REPO_NAME}-deploy in namespace ${KUBE_NAMESPACE}
+          echo "#########################################"
           fi
-          
-          echo "#########################################"
-          argocd app get ${KUBE_NAMESPACE}/${REPO_NAME}-build-test-push
-          echo "#########################################"
-          argocd app get ${KUBE_NAMESPACE}/${REPO_NAME}-deploy
-          echo "#########################################"
-          argocd app get ${KUBE_NAMESPACE}/${REPO_NAME}-db
 
       - name: Watch tekton resources ...
         run: |
