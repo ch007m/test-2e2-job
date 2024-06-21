@@ -82,13 +82,16 @@ jobs:
       - name: Wait till IDP ArgoCD application is sync; ConfigMap patched
         run: |
           SCRIPTS=$(pwd)/.github/scripts
-
+          
+          echo "Temporary workaround to refresh ArgoCD Application till https://github.com/cnoe-io/idpbuilder/pull/307 is released"
+          kubectl annotate --overwrite applications -n argocd argocd argocd.argoproj.io/refresh='normal'
+          
           if ! $SCRIPTS/waitFor.sh application argocd argocd Healthy; then
             echo "Failed to watch application argocd in namespace argocd"
             exit 1;
           fi
           
-          until [[ kubectl get -n argocd cm/argocd-cmd-params-cm -o json | jq -e '.data | has("application.namespaces")' ]]; do
+          until kubectl get -n argocd cm/argocd-cmd-params-cm -o json | jq -e '.data | has("application.namespaces")'; do
              echo "Wait till ConfigMap is patched with data: application.namespaces ..."
              sleep 10
           done
