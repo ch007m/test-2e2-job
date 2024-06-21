@@ -398,34 +398,33 @@ jobs:
             kubectl logs -n argocd deployment/argocd-server
           }
           
+          if ! $SCRIPTS/waitFor.sh application $REPO_NAME-build-test-push ${KUBE_NAMESPACE} Synced ; then
+            log_application $REPO_NAME build-test-push $KUBE_NAMESPACE
+            exit 1;
+          else
+            echo "#########################################"
+            echo "Show Application ${REPO_NAME}-build-test-push in namespace ${KUBE_NAMESPACE}
+            echo "#########################################"
+            argocd app get ${KUBE_NAMESPACE}/${REPO_NAME}-build-test-push
+          fi
           
-            if ! $SCRIPTS/waitFor.sh application $REPO_NAME-build-test-push ${KUBE_NAMESPACE} Synced ; then
-              log_application $REPO_NAME build-test-push $KUBE_NAMESPACE
-              exit 1;
-            else
-              echo "#########################################"
-              echo "Show Application ${REPO_NAME}-build-test-push in namespace ${KUBE_NAMESPACE}
-              echo "#########################################"
-              argocd app get ${KUBE_NAMESPACE}/${REPO_NAME}-build-test-push
-            fi
-            
-            if ! $SCRIPTS/waitFor.sh application $REPO_NAME-db ${KUBE_NAMESPACE} Synced ; then
-              log_application $REPO_NAME db $KUBE_NAMESPACE
-              exit 1;
-            else
-              echo "#########################################"
-              echo "Show Application ${REPO_NAME}-db in namespace ${KUBE_NAMESPACE}
-              echo "#########################################"
-            fi
-            
-            if ! $SCRIPTS/waitFor.sh application $REPO_NAME-deploy $KUBE_NAMESPACE Synced ; then
-              log_application $REPO_NAME deploy $KUBE_NAMESPACE
-              exit 1;
-            else
-              echo "#########################################"
-              echo "Show Application ${REPO_NAME}-deploy in namespace ${KUBE_NAMESPACE}
-              echo "#########################################"
-            fi
+          if ! $SCRIPTS/waitFor.sh application $REPO_NAME-db ${KUBE_NAMESPACE} Synced ; then
+            log_application $REPO_NAME db $KUBE_NAMESPACE
+            exit 1;
+          else
+            echo "#########################################"
+            echo "Show Application ${REPO_NAME}-db in namespace ${KUBE_NAMESPACE}
+            echo "#########################################"
+          fi
+          
+          if ! $SCRIPTS/waitFor.sh application $REPO_NAME-deploy $KUBE_NAMESPACE Synced ; then
+            log_application $REPO_NAME deploy $KUBE_NAMESPACE
+            exit 1;
+          else
+            echo "#########################################"
+            echo "Show Application ${REPO_NAME}-deploy in namespace ${KUBE_NAMESPACE}
+            echo "#########################################"
+          fi
 
       - name: Watch tekton resources ...
         run: |
