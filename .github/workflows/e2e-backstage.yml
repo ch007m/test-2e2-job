@@ -381,7 +381,7 @@ jobs:
             exit 1;
           else
             echo "#########################################"
-            echo "Show Application ${REPO_NAME}-build-test-push in namespace ${KUBE_NAMESPACE}
+            echo "Show Application ${REPO_NAME}-build-test-push in namespace ${KUBE_NAMESPACE}"
             echo "#########################################"
             argocd app get ${KUBE_NAMESPACE}/${REPO_NAME}-build-test-push
           fi
@@ -391,7 +391,7 @@ jobs:
             exit 1;
           else
             echo "#########################################"
-            echo "Show Application ${REPO_NAME}-db in namespace ${KUBE_NAMESPACE}
+            echo "Show Application ${REPO_NAME}-db in namespace ${KUBE_NAMESPACE}"
             echo "#########################################"
           fi
           
@@ -400,7 +400,7 @@ jobs:
             exit 1;
           else
             echo "#########################################"
-            echo "Show Application ${REPO_NAME}-deploy in namespace ${KUBE_NAMESPACE}
+            echo "Show Application ${REPO_NAME}-deploy in namespace ${KUBE_NAMESPACE}"
             echo "#########################################"
           fi
 
