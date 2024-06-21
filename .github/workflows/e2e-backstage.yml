@@ -91,7 +91,7 @@ jobs:
             exit 1;
           fi
           
-          until kubectl get -n argocd cm/argocd-cmd-params-cm -o json | jq -e '.data | has("application.namespaces")'; do
+          until kubectl get -n argocd cm/argocd-cmd-params-cm -o json | jq -e '.data | has("application.namespaces")' 2>&1; do
              echo "Wait till ConfigMap is patched with data: application.namespaces ..."
              sleep 10
           done
