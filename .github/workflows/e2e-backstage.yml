@@ -377,9 +377,14 @@ jobs:
           SCRIPTS=$(pwd)/.github/scripts
           
           echo "#########################################"
-          echo "Log the AppProject of the children application ..."
+          echo "List the AppProject ..."
           echo "#########################################"
-          kubectl -n ${KUBE_NAMESPACE} get appproject $REPO_NAME -oyaml
+          kubectl get appproject -A
+          
+          echo "#########################################"
+          echo "Show the AppProject ..."
+          echo "#########################################"
+          kubectl get appproject -A -oyaml
           
           echo "#########################################"
           echo "Log the Application YAML for $REPO_NAME-build-test-push ..."
