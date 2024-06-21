@@ -228,7 +228,7 @@ jobs:
           kubectl rollout restart -n argocd deployment argocd-server
           kubectl rollout restart -n argocd statefulset argocd-application-controller
 
-          kubectl wait --for=condition=Ready statefulset/argocd-application-controller -n argocd --timeout=360s
+          kubectl rollout status --watch statefulset/argocd-application-controller -n argocd --timeout=600s
 
       - uses: actions/setup-node@v4
         with:
