@@ -226,7 +226,9 @@ jobs:
         run: |
           echo "Rollout Argocd to take into consideration the new namespace created ..."
           kubectl rollout restart -n argocd deployment argocd-server
-          kubectl rollout restart -n argocd statefulset argocd-application-controller          
+          kubectl rollout restart -n argocd statefulset argocd-application-controller
+
+          kubectl wait --for=condition=Ready statefulset/argocd-application-controller -n argocd --timeout=360s
 
       - uses: actions/setup-node@v4
         with:
