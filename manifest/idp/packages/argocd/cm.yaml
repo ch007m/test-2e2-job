@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/part-of: argocd
 data:
   application.namespaces: "dummy"
+  controller.log.level: "debug"
 ---
 apiVersion: v1
 kind: ConfigMap
