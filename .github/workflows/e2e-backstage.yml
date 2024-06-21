@@ -466,11 +466,21 @@ jobs:
           echo "List Argo Application ..."
           echo "#########################################"
           argocd app list
+
+          echo "#########################################"
+          echo "Log ArgoCD application-controller ..."
+          echo "#########################################"
+          kubectl logs -n argocd -lapp.kubernetes.io/name=argocd-application-controller --tail=-1
           
           echo "#########################################"
           echo "List the Argocd projects ..."
           echo "#########################################"
           kubectl get appprojects -A
+          
+          echo "#########################################"
+          echo "Log ArgoCD projects YAML and events"
+          echo "#########################################"
+          kubectl get appprojects -A -oyaml
           
           echo "#########################################"
           echo "List the Argocd applications: parent and children ..."
