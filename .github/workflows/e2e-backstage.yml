@@ -383,17 +383,17 @@ jobs:
             echo "Failed to get application $REPO_NAME-$SUFFIX Synced in namespace: $NAMESPACE"
           
             echo "#########################################"
-            echo "Describe Application: $REPO_NAME-$SUFFIX in namespace: $NAMESPACE
+            echo "Describe Application: $REPO_NAME-$SUFFIX in namespace: $NAMESPACE"
             echo "#########################################"  
             kubectl describe application $REPO_NAME-$SUFFIX -n $NAMESPACE
           
             echo "#########################################"
-            echo "Application YAML: $REPO_NAME-$SUFFIX in namespace: $NAMESPACE
+            echo "Application YAML: $REPO_NAME-$SUFFIX in namespace: $NAMESPACE"
             echo "#########################################"  
-            kubectl get application $REPO_NAME-$SUFFIX -n $NAMESPACE -o yaml         
+            kubectl get application $REPO_NAME-$SUFFIX -n $NAMESPACE -o yaml     
            
             echo "#########################################"
-            echo "Log ArgoCD server
+            echo "Log ArgoCD server"
             echo "#########################################"
             kubectl logs -n argocd deployment/argocd-server
           }
