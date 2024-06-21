@@ -89,9 +89,14 @@ jobs:
           fi
           
           echo "#########################################"          
-          echo "Show ArgoCD CM to verify if it includes parameters needed to work cross namespaces ..."
+          echo "Check if the ConfigMap has been patched and resources sync, otherwise exit"
           echo "#########################################"
-          kubectl get -n argocd cm/argocd-cmd-params-cm -oyaml
+          if kubectl get -n argocd cm/argocd-cmd-params-cm -o json | jq -e '.data | has("application.namespaces")'; then
+            echo "Key 'application.namespaces' exists in the ConfigMap."
+          else
+            echo "Key 'application.namespaces' does not exist in the ConfigMap."
+            exit 1;
+          fi
 
 #      - name: Install Kubevirt
 #        run: |
