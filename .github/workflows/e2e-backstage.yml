@@ -387,10 +387,10 @@ jobs:
               echo "#########################################"  
               kubectl describe application $REPO_NAME-$SUFFIX -n $NAMESPACE
           
-            echo "#########################################"
-            echo "Application YAML: $REPO_NAME-$SUFFIX in namespace: $NAMESPACE
-            echo "#########################################"  
-            kubectl get application $REPO_NAME-$SUFFIX -n $NAMESPACE -o yaml         
+              echo "#########################################"
+              echo "Application YAML: $REPO_NAME-$SUFFIX in namespace: $NAMESPACE
+              echo "#########################################"  
+              kubectl get application $REPO_NAME-$SUFFIX -n $NAMESPACE -o yaml         
              
               echo "#########################################"
               echo "Log ArgoCD server
