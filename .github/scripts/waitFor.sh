@@ -11,19 +11,25 @@ EXTRA="${5-}"
 
 retries=30
 until [[ $retries == 0 ]]; do
-  actual=$(kubectl get $RESOURCE $NAME -n $KUBE_NAMESPACE $EXTRA 2>/dev/null || echo "Waiting for $RESOURCE/$NAME -> $EXPECTED to appear")
+  actual=$(kubectl get $RESOURCE $NAME -n $KUBE_NAMESPACE $EXTRA 2>/dev/null || echo "Waiting for $RESOURCE/$NAME in namespace $KUBE_NAMESPACE -> $EXPECTED to appear")
   if [[ "$actual" =~ .*"$EXPECTED".* ]]; then
     echo "Resource \"$RESOURCE/$NAME\" found" 2>&1
     echo "$actual" 2>&1
     break
   else
-    echo "Waiting for resource \"$RESOURCE/$NAME\" ..." 2>&1
+    echo "Waiting for resource \"$RESOURCE/$NAME\" in namespace $KUBE_NAMESPACE ..." 2>&1
     echo "$actual" 2>&1
   fi
   sleep 10s
   retries=$((retries - 1))
 done
 
-echo "Describe the resource ..."
-echo "kubectl describe $RESOURCE $NAME -n $KUBE_NAMESPACE" 2>&1
+echo "#########################################"
+echo "Describe resource: $RESOURCE $NAME in namespace $KUBE_NAMESPACE"
+echo "#########################################"
 kubectl describe $RESOURCE $NAME -n $KUBE_NAMESPACE 2>&1
+
+echo "#########################################"
+echo "Resource YAML: $NAME in namespace $KUBE_NAMESPACE"
+echo "#########################################"
+kubectl get $RESOURCE $NAME -n $KUBE_NAMESPACE -o yaml
