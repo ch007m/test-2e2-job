@@ -90,9 +90,10 @@ jobs:
             echo "Failed to watch application argocd in namespace argocd"
             exit 1;
           fi
-          
+
+          echo "Wait till ConfigMap is patched with data: application.namespaces ..."          
           until kubectl get -n argocd cm/argocd-cmd-params-cm -o json | jq -e '.data | has("application.namespaces")'; do
-             echo "Wait till ConfigMap is patched with data: application.namespaces ..."
+             echo "Still waiting ..."
              sleep 10s
           done
           
