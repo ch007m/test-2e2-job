@@ -79,7 +79,7 @@ jobs:
         run: |
           kubectl create ns ${KUBE_NAMESPACE}
 
-      - name: Wait till IDP ArgoCD applications is sync
+      - name: Wait till IDP ArgoCD application is sync; ConfigMap patched
         run: |
           SCRIPTS=$(pwd)/.github/scripts
 
@@ -87,6 +87,11 @@ jobs:
             echo "Failed to watch application argocd in namespace argocd"
             exit 1;
           fi
+          
+          until [[ kubectl get -n argocd cm/argocd-cmd-params-cm -o json | jq -e '.data | has("application.namespaces")' ]]; do
+             echo "Wait till ConfigMap is patched with data: application.namespaces ..."
+             sleep 10
+          done
           
           echo "#########################################"          
           echo "Check if the ConfigMap has been patched and resources sync, otherwise exit"
