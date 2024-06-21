@@ -376,6 +376,22 @@ jobs:
         run: |          
           SCRIPTS=$(pwd)/.github/scripts
           
+          cat <<EOF > app-sync-hook.yaml
+          operation:
+            initiatedBy:
+              username: admin
+            sync:
+              syncStrategy:
+                hook: {}
+          EOF
+          
+          echo "#########################################"
+          echo "Patch the Application to sync it"
+          echo "#########################################"
+          kubectl -n ${KUBE_NAMESPACE} patch app $REPO_NAME-build-test-push --patch-file app-sync-hook.yaml --type merge
+          sleep 20s
+          kubectl -n ${KUBE_NAMESPACE} get application $REPO_NAME-build-test-push -oyaml
+          
           if ! $SCRIPTS/waitFor.sh application $REPO_NAME-build-test-push ${KUBE_NAMESPACE} Synced ; then
             $SCRIPTS/logApplication.sh $REPO_NAME build-test-push $KUBE_NAMESPACE
             exit 1;
